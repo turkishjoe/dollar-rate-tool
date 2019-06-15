@@ -6,9 +6,16 @@
 
 namespace App\Service\Dollar;
 
+use App\Exception\ServiceException;
 
-use App\Service\Http\Client;
-
+/**
+ * Сервис, который получает курс доллара из сервиса
+ * https://www.cbr.ru/development/SXML/
+ *
+ * Class CbrService
+ *
+ * @package App\Service\Dollar
+ */
 class CbrService extends AbstractRateService
 {
     /**
@@ -29,16 +36,31 @@ class CbrService extends AbstractRateService
     }
 
     /**
-     * TODO:
+     * Обработка запроса
      *
-     * @param $response
+     * @param string $response
      *
-     * @return mixed
+     * @return float
      */
-    protected function processData($response)
+    protected function processData(string $response): float
     {
         $data = simplexml_load_string($response);
 
-        return $data;
+        if(isset($data->Record->Value)){
+            return $this->toFloat($data->Record->Value);
+        }
+
+        throw new ServiceException("Bad service response body");
+    }
+
+    /**
+     * TODO:
+     *
+     * @param $number
+     *
+     * @return float
+     */
+    protected function toFloat($number){
+        return floatval(str_replace(',', '.', str_replace('.', '', $number)));
     }
 }

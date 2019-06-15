@@ -6,16 +6,16 @@
 
 namespace App\Command;
 
-
-use App\Service\Dollar\CbrService;
-use App\Service\Dollar\RateService;
+use App\Exception\ServiceException;
+use App\Exception\SystemException;
+use App\Service\Dollar\RateLocator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * TODO:
+ * Комманда для получения курса доллара
  *
  * Class GetDollarRate
  *
@@ -24,24 +24,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 class GetDollarRate extends Command
 {
     /**
-     * https://cash.rbc.ru/cash/json/converter_currency_rate
-     */
-    const TYPE_CBR = 0;
-
-    /**
-     * https://www.cbr.ru/development/SXML/
-     */
-    const TYPE_CASH_CBR = 1;
-
-    /**
-     * TODO:
+     * Сервис
      *
-     * @var RateService
+     * @var RateLocator
      */
     private $rateService;
 
 
-    public function __construct(?string $name = null, CbrService $rateService)
+    public function __construct(?string $name = null, RateLocator $rateService)
     {
         parent::__construct($name);
 
@@ -56,7 +46,7 @@ class GetDollarRate extends Command
             ->addArgument('type', InputArgument::OPTIONAL, 'Type of service
             0 - https://cash.rbc.ru/cash/json/converter_currency_rate
             1 - https://www.cbr.ru/development/SXML/
-            ', self::TYPE_CBR)
+            ', RateLocator::TYPE_CBR)
             ->setDescription('');
     }
 
@@ -66,7 +56,14 @@ class GetDollarRate extends Command
         $dateString = $input->getArgument('datetime') ;
         $date = new \DateTime($dateString);
 
-        var_dump($this->rateService->getRate($date));
-       // $output->writeln($this->rateService->getRate());
+        try{
+           $result = $this->rateService->get($type)->getRate($date);
+           $output->writeln(sprintf('Rate is %s', $result));
+        }catch (ServiceException $exception){
+           $output->writeln('error');
+           $output->writeln($exception->getMessage());
+        }catch (SystemException $exception){
+            //Куда-нибудь логировать
+        }
     }
 }

@@ -9,6 +9,13 @@ namespace App\Service\Dollar;
 
 use App\Exception\ServiceException;
 
+/**
+ * Сервис для получения данных https://cash.rbc.ru/cash/json/converter_currency_rate
+ *
+ * Class RbcService
+ *
+ * @package App\Service\Dollar
+ */
 class RbcService extends AbstractRateService
 {
     /**
@@ -31,19 +38,19 @@ class RbcService extends AbstractRateService
     }
 
     /**
-     * TODO:
+     * Обработка запроса
      *
-     * @param $response
+     * @param string $response
      *
-     * @return mixed
+     * @return float
      */
-    protected function processData($response)
+    protected function processData(string $response): float
     {
         $data = json_decode($response, true);
         if(!isset($data['status']) || $data['status'] !== 200
            || !isset($data['data']['sum_result'])
         ){
-            throw new ServiceException("Bad status code in body");
+            throw new ServiceException("Bad service response body");
         }
 
         return $data['data']['sum_result'];

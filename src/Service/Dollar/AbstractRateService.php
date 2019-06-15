@@ -9,14 +9,21 @@ namespace App\Service\Dollar;
 
 use App\Service\Http\Client;
 
+/**
+ * Базовый класс для получения курса доллара
+ *
+ * Class AbstractRateService
+ *
+ * @package App\Service\Dollar
+ */
 abstract class AbstractRateService
 {
     /**
-     * TODO:
+     * Класс клиента
      *
      * @var Client
      */
-    private $client;
+    protected $client;
 
     public function __construct(Client $client)
     {
@@ -24,7 +31,7 @@ abstract class AbstractRateService
     }
 
     public function getRate(\DateTime $date){
-        $url = $this->getRate($date);
+        $url = $this->prepareRequest($date);
         $result = $this->client->makeRequest($url);
 
         return $this->processData($result);
@@ -39,11 +46,11 @@ abstract class AbstractRateService
     abstract protected function prepareRequest(\DateTime $date) : string ;
 
     /**
-     * TODO:
+     * Обработка запроса
      *
-     * @param $response
+     * @param string $response
      *
      * @return mixed
      */
-    abstract protected function processData($response);
+    abstract protected function processData(string $response) : float ;
 }

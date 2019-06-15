@@ -17,5 +17,14 @@ services:
         resource: '../src/*'
         exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
+    App\Service\Dollar\RbcService:
+        class: App\Service\Dollar\RbcService
+        public: true
+
+    App\Service\Dollar\CbrService:
+        class: App\Service\Dollar\CbrService
+        public: true
+
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
