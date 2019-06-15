@@ -41,8 +41,11 @@ class GetDollarRate extends Command
     private $validator;
 
 
-    public function __construct(?string $name = null, RateLocator $rateService, ValidatorInterface $validator)
-    {
+    public function __construct(
+        ?string $name = null,
+        RateLocator $rateService,
+        ValidatorInterface $validator
+    ) {
         parent::__construct($name);
 
         $this->rateService = $rateService;
@@ -53,7 +56,8 @@ class GetDollarRate extends Command
     {
         $this
             ->setName('app:add_provider')
-            ->addArgument('datetime', InputArgument::OPTIONAL, 'Date of rate', 'now')
+            ->addArgument('datetime', InputArgument::OPTIONAL, 'Date of rate',
+                'now')
             ->addArgument('type', InputArgument::OPTIONAL, 'Type of service
             0 - https://cash.rbc.ru/cash/json/converter_currency_rate
             1 - https://www.cbr.ru/development/SXML/
@@ -64,15 +68,15 @@ class GetDollarRate extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $type = (int)$input->getArgument('type');
-        $dateString = $input->getArgument('datetime') ;
+        $dateString = $input->getArgument('datetime');
         $date = new \DateTime($dateString);
 
         $errors = $this->validate($date, $type);
-        if(count($errors) !== 0){
-            foreach ($errors as $error){
+        if (count($errors) !== 0) {
+            foreach ($errors as $error) {
                 $output->writeln($error->getMessage());
             }
-        }else {
+        } else {
             try {
                 $result = $this->rateService->get($type)->getRate($date);
                 $output->writeln(sprintf('Rate is %s', $result));
@@ -102,16 +106,16 @@ class GetDollarRate extends Command
                 'datetime' => new LessThanOrEqual('now'),
                 'type' => new Choice([
                     RateLocator::TYPE_CBR,
-                    RateLocator::TYPE_CASH_CBR
-                ])
+                    RateLocator::TYPE_CASH_CBR,
+                ]),
             ]
         );
 
         $errors = $this->validator->validate([
             'datetime' => $date,
-            'type' => $type
+            'type' => $type,
         ], $constraint);
 
         return $errors;
-}
+    }
 }

@@ -27,14 +27,15 @@ class RbcService extends AbstractRateService
     protected function prepareRequest(\DateTime $date): string
     {
         $params = [
-            'currency_from'=>'USD',
-            'currency_to'=>'RUR',
-            'source'=>'cbrf',
-            'sum'=>1,
-            'date'=>$date->format('Y-m-d')
+            'currency_from' => 'USD',
+            'currency_to' => 'RUR',
+            'source' => 'cbrf',
+            'sum' => 1,
+            'date' => $date->format('Y-m-d'),
         ];
 
-        return 'https://cash.rbc.ru/cash/json/converter_currency_rate/?' . http_build_query($params);
+        return 'https://cash.rbc.ru/cash/json/converter_currency_rate/?'
+            .http_build_query($params);
     }
 
     /**
@@ -47,9 +48,9 @@ class RbcService extends AbstractRateService
     protected function processData(string $response): float
     {
         $data = json_decode($response, true);
-        if(!isset($data['status']) || $data['status'] !== 200
-           || !isset($data['data']['sum_result'])
-        ){
+        if (!isset($data['status']) || $data['status'] !== 200
+            || !isset($data['data']['sum_result'])
+        ) {
             throw new ServiceException("Bad service response body");
         }
 

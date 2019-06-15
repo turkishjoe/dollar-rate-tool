@@ -30,7 +30,8 @@ abstract class AbstractRateService
         $this->client = $client;
     }
 
-    public function getRate(\DateTime $date){
+    public function getRate(\DateTime $date)
+    {
         $url = $this->prepareRequest($date);
         $result = $this->client->makeRequest($url);
 
@@ -43,7 +44,7 @@ abstract class AbstractRateService
      *
      * @return string
      */
-    abstract protected function prepareRequest(\DateTime $date) : string ;
+    abstract protected function prepareRequest(\DateTime $date): string;
 
     /**
      * Обработка запроса
@@ -52,5 +53,5 @@ abstract class AbstractRateService
      *
      * @return mixed
      */
-    abstract protected function processData(string $response) : float ;
+    abstract protected function processData(string $response): float;
 }

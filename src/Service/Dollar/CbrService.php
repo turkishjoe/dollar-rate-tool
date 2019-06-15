@@ -27,12 +27,13 @@ class CbrService extends AbstractRateService
     protected function prepareRequest(\DateTime $date): string
     {
         $params = [
-            'VAL_NM_RQ'=>'R01235',
-            'date_req1'=>$date->format('d/m/Y'),
-            'date_req2'=>$date->format('d/m/Y')
+            'VAL_NM_RQ' => 'R01235',
+            'date_req1' => $date->format('d/m/Y'),
+            'date_req2' => $date->format('d/m/Y'),
         ];
 
-        return 'http://www.cbr.ru/scripts/XML_dynamic.asp/?' . http_build_query($params);
+        return 'http://www.cbr.ru/scripts/XML_dynamic.asp/?'
+            .http_build_query($params);
     }
 
     /**
@@ -46,7 +47,7 @@ class CbrService extends AbstractRateService
     {
         $data = simplexml_load_string($response);
 
-        if(isset($data->Record->Value)){
+        if (isset($data->Record->Value)) {
             return $this->toFloat($data->Record->Value);
         }
 
@@ -60,7 +61,8 @@ class CbrService extends AbstractRateService
      *
      * @return float
      */
-    protected function toFloat($number){
+    protected function toFloat($number)
+    {
         return floatval(str_replace(',', '.', str_replace('.', '', $number)));
     }
 }
