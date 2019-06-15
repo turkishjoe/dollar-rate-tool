@@ -7,27 +7,38 @@
 namespace App\Service\Dollar;
 
 
-class CbrService
+use App\Service\Http\Client;
+
+class CbrService extends AbstractRateService
 {
-    public function getRate(\DateTime $date){
+    /**
+     * Подготавливает данные для запроса. В нашем случае достаточно url,
+     * при усложнении логики можно сделать объект Request и возвращать его
+     *
+     * @return string
+     */
+    protected function prepareRequest(\DateTime $date): string
+    {
         $params = [
             'VAL_NM_RQ'=>'R01235',
             'date_req1'=>$date->format('d/m/Y'),
             'date_req2'=>$date->format('d/m/Y')
         ];
 
-        $url = 'http://www.cbr.ru/scripts/XML_dynamic.asp/?' . http_build_query($params);
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        $result = curl_exec($ch);
-        $info = curl_getinfo($ch);
-        if($info['http_code'] != 200)
-        {
+        return 'http://www.cbr.ru/scripts/XML_dynamic.asp/?' . http_build_query($params);
+    }
 
-        }
-        curl_close($ch);
-        return json_decode($result, true);
+    /**
+     * TODO:
+     *
+     * @param $response
+     *
+     * @return mixed
+     */
+    protected function processData($response)
+    {
+        $data = simplexml_load_string($response);
+
+        return $data;
     }
 }

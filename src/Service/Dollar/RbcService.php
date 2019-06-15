@@ -7,9 +7,18 @@
 namespace App\Service\Dollar;
 
 
-class RbcService
+use App\Exception\ServiceException;
+
+class RbcService extends AbstractRateService
 {
-    public function getRate(\DateTimeInterface $date){
+    /**
+     * Подготавливает данные для запроса. В нашем случае достаточно url,
+     * при усложнении логики можно сделать объект Request и возвращать его
+     *
+     * @return string
+     */
+    protected function prepareRequest(\DateTime $date): string
+    {
         $params = [
             'currency_from'=>'USD',
             'currency_to'=>'RUR',
@@ -18,18 +27,25 @@ class RbcService
             'date'=>$date->format('Y-m-d')
         ];
 
-        $url = 'https://cash.rbc.ru/cash/json/converter_currency_rate/?' . http_build_query($params);
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        $result = curl_exec($ch);
-        $info = curl_getinfo($ch);
-        if($info['http_code'] != 200)
-        {
+        return 'https://cash.rbc.ru/cash/json/converter_currency_rate/?' . http_build_query($params);
+    }
 
+    /**
+     * TODO:
+     *
+     * @param $response
+     *
+     * @return mixed
+     */
+    protected function processData($response)
+    {
+        $data = json_decode($response, true);
+        if(!isset($data['status']) || $data['status'] !== 200
+           || !isset($data['data']['sum_result'])
+        ){
+            throw new ServiceException("Bad status code in body");
         }
-        curl_close($ch);
-        return json_decode($result, true);
+
+        return $data['data']['sum_result'];
     }
 }
